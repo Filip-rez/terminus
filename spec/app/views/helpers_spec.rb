@@ -25,7 +25,7 @@ RSpec.describe Terminus::Views::Helpers do
 
     it "answers empty array when not found" do
       record = Data.define(:id, :label).new 1, "Test"
-      expect(helper.default_option([record], "Invalid")).to eq([])
+      expect(helper.default_option([record], "Invalid")).to eq(["Select...", nil])
     end
   end
 

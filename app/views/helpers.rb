@@ -27,7 +27,7 @@ module Terminus
         label, id = build_label_and_id key_map
 
         records.find { it.public_send(label) == selection }
-               .then { it ? [it.public_send(label), it.public_send(id)] : Core::EMPTY_ARRAY }
+               .then { it ? [it.public_send(label), it.public_send(id)] : ["Select...", nil] }
       end
 
       # rubocop:todo-next Metrics/ParameterLists
