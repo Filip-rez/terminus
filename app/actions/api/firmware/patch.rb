@@ -21,13 +21,15 @@ module Terminus
               optional(:version).filled Types::Version
               optional(:uri).filled :string
             end
+
+            required(:model_ids).filled(:array).each(:integer)
           end
 
           def handle request, response
             parameters = request.params
 
             if parameters.valid?
-              process(*parameters.to_h.values_at(:id, :firmware), response)
+              process parameters.to_h, response
             else
               unprocessable_content parameters, response
             end
@@ -35,9 +37,10 @@ module Terminus
 
           private
 
-          def process id, parameters, response
-            uri = parameters.delete :uri
-            record = repository.update id, parameters
+          def process parameters, response
+            id, attributes, model_ids = parameters.values_at :id, :firmware, :model_ids
+            uri = attributes.delete :uri
+            record = repository.update_with_models id, attributes, model_ids
 
             return response.with body: {data: serializer.new(record).to_h}.to_json unless uri
 

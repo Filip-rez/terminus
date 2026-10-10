@@ -1105,6 +1105,9 @@ curl "https://localhost:2443/api/firmware/1" \
       "mime_type": "application/octet-stream",
       "size": 1306608,
       "uri": "/uploads/60a5253edd0ab53cc31619a836c6cdb8.bin",
+      "model_ids": [
+        1
+      ],
       "created_at": "2026-01-08T21:26:34+00:00",
       "updated_at": "2026-01-08T21:26:34+00:00"
     }
@@ -1119,6 +1122,9 @@ curl "https://localhost:2443/api/firmware/1" \
     "file_name": "1.7.2.bin",
     "mime_type": "application/octet-stream",
     "size": 1306608,
+    "model_ids": [
+      1
+    ],
     "uri": "/uploads/60a5253edd0ab53cc31619a836c6cdb8.bin",
     "created_at": "2026-01-08T21:26:34+00:00",
     "updated_at": "2026-01-08T21:26:34+00:00"
@@ -1140,7 +1146,10 @@ curl -X "POST" "https://localhost:2443/api/firmware" \
      -d $'{
   "firmware": {
     "version": "2.0.0",
-    "uri": "https://demo.terminus.io/2.0.0.bin"
+    "uri": "https://demo.terminus.io/2.0.0.bin",
+    "model_ids": [
+      1
+    ]
   }
 }'
 ----
@@ -1158,6 +1167,9 @@ curl -X "POST" "https://localhost:2443/api/firmware" \
     "file_name": "2.0.0.bin",
     "mime_type": "application/octet-stream",
     "size": 1225536,
+    "model_ids": [
+      1
+    ],
     "uri": "/uploads/0c2f5a1acb23d20e9f72828254c4f258.bin",
     "created_at": "2026-01-12T22:32:08+00:00",
     "updated_at": "2026-01-12T22:32:09+00:00"
@@ -1181,7 +1193,7 @@ curl -X "PATCH" "https://localhost:2443/api/firmware/10" \
 }'
 ----
 
-You can change a single attribute or multiple attributes at once.
+You can change a single attribute or multiple attributes at once. All attributes supported in the POST request is supported via PATCH too.
 ====
 
 .PATCH Response
@@ -1196,6 +1208,9 @@ You can change a single attribute or multiple attributes at once.
     "file_name": "2.0.0.bin",
     "mime_type": "application/octet-stream",
     "size": 1225536,
+    "model_ids": [
+      1
+    ],
     "uri": "/uploads/31c6151dfa9362053022a9bfcab5b2b5.bin",
     "created_at": "2026-01-12T22:32:08+00:00",
     "updated_at": "2026-01-12T22:32:42+00:00"
@@ -1229,6 +1244,8 @@ curl -X "DELETE" "https://localhost:2443/api/firmware/10" \
     "mime_type": "application/octet-stream",
     "size": 1225536,
     "uri": "/uploads/31c6151dfa9362053022a9bfcab5b2b5.bin",
+    "model_ids": [
+    ],
     "created_at": "2026-01-12T22:32:08+00:00",
     "updated_at": "2026-01-12T22:32:42+00:00"
   }

@@ -7,6 +7,8 @@ RSpec.describe "/api/firmware", :db do
 
   let(:firmware) { Factory[:firmware, :with_attachment, **attributes] }
   let(:uri) { "https://trmnl-fw.s3.us-east-2.amazonaws.com/trmnl_og/FW1.8.5.bin" }
+  let(:model) { Factory[:model] }
+  let(:firmware_model) { Factory[:firmware_model, firmware_id: firmware.id, model_id: model.id] }
 
   let :attributes do
     {
@@ -17,7 +19,7 @@ RSpec.describe "/api/firmware", :db do
   include_context "with temporary directory"
 
   it "answers firmwares" do
-    firmware
+    firmware_model
 
     get routes.path(:api_firmwares),
         {},
@@ -33,6 +35,7 @@ RSpec.describe "/api/firmware", :db do
           uri: "memory://abc123.bin",
           mime_type: "application/octet-stream",
           size: 4,
+          model_ids: [model.id],
           created_at: match_rfc_3339,
           updated_at: match_rfc_3339
         }
@@ -50,6 +53,8 @@ RSpec.describe "/api/firmware", :db do
   end
 
   it "answers existing firmware" do
+    firmware_model
+
     get routes.path(:api_firmware, id: firmware.id),
         {},
         "HTTP_AUTHORIZATION" => access_token,
@@ -63,6 +68,7 @@ RSpec.describe "/api/firmware", :db do
         uri: "memory://abc123.bin",
         mime_type: "application/octet-stream",
         size: 4,
+        model_ids: [model.id],
         created_at: match_rfc_3339,
         updated_at: match_rfc_3339
       }
@@ -80,7 +86,7 @@ RSpec.describe "/api/firmware", :db do
 
   it "creates firmware when valid" do
     post routes.path(:api_firmwares),
-         {firmware: {uri:, **attributes}}.to_json,
+         {firmware: {uri:, **attributes}, model_ids: [model.id]}.to_json,
          "HTTP_AUTHORIZATION" => access_token,
          "CONTENT_TYPE" => "application/json"
 
@@ -92,6 +98,7 @@ RSpec.describe "/api/firmware", :db do
         uri: %r(memory://\h{32}\.bin),
         mime_type: "application/octet-stream",
         size: kind_of(Integer),
+        model_ids: [model.id],
         created_at: match_rfc_3339,
         updated_at: match_rfc_3339
       }
@@ -100,7 +107,7 @@ RSpec.describe "/api/firmware", :db do
 
   it "answers error with invalid URI for POST" do
     post routes.path(:api_firmwares),
-         {firmware: {uri: "bogus", **attributes}}.to_json,
+         {firmware: {uri: "bogus", **attributes}, model_ids: [model.id]}.to_json,
          "HTTP_AUTHORIZATION" => access_token,
          "CONTENT_TYPE" => "application/json"
 
@@ -114,7 +121,7 @@ RSpec.describe "/api/firmware", :db do
     expect(json_payload).to match(problem.to_h)
   end
 
-  it "answers error with missing URI" do
+  it "answers error with missing create attributes" do
     post routes.path(:api_firmwares),
          {firmware: attributes}.to_json,
          "HTTP_AUTHORIZATION" => access_token,
@@ -129,7 +136,8 @@ RSpec.describe "/api/firmware", :db do
         errors: {
           firmware: {
             uri: ["is missing"]
-          }
+          },
+          model_ids: ["is missing"]
         }
       }
     ]
@@ -139,7 +147,7 @@ RSpec.describe "/api/firmware", :db do
 
   it "patches firmware when valid with attachment" do
     patch routes.path(:api_firmware, id: firmware.id),
-          {firmware: {uri:, **attributes}}.to_json,
+          {firmware: {uri:, **attributes}, model_ids: [model.id]}.to_json,
           "HTTP_AUTHORIZATION" => access_token,
           "CONTENT_TYPE" => "application/json"
 
@@ -151,6 +159,7 @@ RSpec.describe "/api/firmware", :db do
         uri: %r(memory://\h{32}\.bin),
         mime_type: "application/octet-stream",
         size: kind_of(Integer),
+        model_ids: [model.id],
         created_at: match_rfc_3339,
         updated_at: match_rfc_3339
       }
@@ -159,7 +168,7 @@ RSpec.describe "/api/firmware", :db do
 
   it "patches firmware when valid without attachment" do
     patch routes.path(:api_firmware, id: firmware.id),
-          {firmware: attributes}.to_json,
+          {firmware: attributes, model_ids: [model.id]}.to_json,
           "HTTP_AUTHORIZATION" => access_token,
           "CONTENT_TYPE" => "application/json"
 
@@ -171,6 +180,7 @@ RSpec.describe "/api/firmware", :db do
         uri: "memory://abc123.bin",
         mime_type: "application/octet-stream",
         size: 4,
+        model_ids: [model.id],
         created_at: match_rfc_3339,
         updated_at: match_rfc_3339
       }
@@ -179,7 +189,7 @@ RSpec.describe "/api/firmware", :db do
 
   it "answers error with invalid URI for PATCH" do
     patch routes.path(:api_firmware, id: firmware.id),
-          {firmware: {uri: "bogus"}}.to_json,
+          {firmware: {uri: "bogus"}, model_ids: [model.id]}.to_json,
           "HTTP_AUTHORIZATION" => access_token,
           "CONTENT_TYPE" => "application/json"
 
@@ -193,7 +203,7 @@ RSpec.describe "/api/firmware", :db do
     expect(json_payload).to match(problem.to_h)
   end
 
-  it "answers error with missing attributes" do
+  it "answers error with missing patch attributes" do
     patch routes.path(:api_firmware, id: firmware.id),
           {firmware: {}}.to_json,
           "HTTP_AUTHORIZATION" => access_token,
@@ -206,7 +216,8 @@ RSpec.describe "/api/firmware", :db do
       instance: "/api/firmware",
       extensions: {
         errors: {
-          firmware: ["must be filled"]
+          firmware: ["must be filled"],
+          model_ids: ["is missing"]
         }
       }
     ]
@@ -228,6 +239,7 @@ RSpec.describe "/api/firmware", :db do
         uri: "memory://abc123.bin",
         mime_type: "application/octet-stream",
         size: 4,
+        model_ids: [],
         created_at: match_rfc_3339,
         updated_at: match_rfc_3339
       }

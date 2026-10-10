@@ -19,13 +19,15 @@ module Terminus
               required(:version).filled Types::Version
               required(:uri).filled :string
             end
+
+            required(:model_ids).filled(:array).each(:integer)
           end
 
           def handle request, response
             parameters = request.params
 
             if parameters.valid?
-              process parameters[:firmware], response
+              process parameters.to_h, response
             else
               unprocessable_content parameters, response
             end
@@ -33,9 +35,11 @@ module Terminus
 
           private
 
+          # :reek:TooManyStatements
           def process parameters, response
-            uri = parameters.delete :uri
-            record = repository.create parameters
+            attributes, model_ids = parameters.values_at :firmware, :model_ids
+            uri = attributes.delete :uri
+            record = repository.create_with_models attributes, model_ids
 
             downloader.call(uri)
                       .either -> http_response { upload record, http_response.body.to_s, response },
