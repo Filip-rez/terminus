@@ -9,6 +9,7 @@ module Terminus
         required(:version).filled Types::Version
         required(:name).filled :string
         required(:label).filled :string
+        required(:mode).filled :string
         required(:content).filled :string
       end
     end

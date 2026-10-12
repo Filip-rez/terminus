@@ -16,6 +16,7 @@ RSpec.describe Terminus::Aspects::Designs::Importer, :db do
         version: 1.2.3
         name: test
         label: Test
+        mode: dither
       CONTENT
     end
 
@@ -28,14 +29,23 @@ RSpec.describe Terminus::Aspects::Designs::Importer, :db do
     end
 
     it "answers success" do
-      expect(creator.call(io)).to match(Success(kind_of(Terminus::Structs::ScreenTemplate)))
+      attributes = creator.call(io).success.to_h
+
+      expect(attributes).to include(
+        name: "test",
+        label: "Test",
+        mode: "dither",
+        content: "<h1>Test</h1>"
+      )
     end
 
     context "with invalid configuration" do
       let(:configuration) { "version: 1.2.3" }
 
       it "answers failure configuration is missing keys" do
-        expect(creator.call(io)).to be_failure("Import name is missing and label is missing.")
+        expect(creator.call(io)).to be_failure(
+          "Import name is missing, label is missing, and mode is missing."
+        )
       end
     end
 
