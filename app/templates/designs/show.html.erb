@@ -17,11 +17,23 @@
       </div>
 
       <dl class="bit-definition-list">
-        <dt class="key">Label</dt>
+        <dt class="key">
+          Label
+          <%= scope(:popover_trigger_button, tip: :info, target: :label).render %>
+        </dt>
         <dd class="value"><%= template.label %></dd>
 
-        <dt class="key">Name</dt>
+        <dt class="key">
+          Name
+          <%= scope(:popover_trigger_button, tip: :info, target: :name).render %>
+        </dt>
         <dd class="value"><%= template.name %></dd>
+
+        <dt class="key">
+          Mode
+          <%= scope(:popover_trigger_button, tip: :info, target: :mode).render %>
+        </dt>
+        <dd class="value"><%= template.mode_label %></dd>
 
         <dt class="key">Created</dt>
         <dd class="value"><%= human_at template.created_at %></dd>
@@ -33,6 +45,6 @@
   </div>
 
   <%= scope(:tooltip_action_content, label: "Edit").render %>
-  <%= render "screens/shared/popovers/all" %>
+  <%= render "designs/shared/popovers/all" %>
 </section>
 

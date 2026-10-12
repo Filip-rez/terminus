@@ -5,7 +5,7 @@ module Terminus
     module Designs
       # The show view.
       class Show < View
-        decorate :template
+        decorate :template, as: Parts::ScreenTemplate
       end
     end
   end
