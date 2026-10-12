@@ -16,7 +16,7 @@ module Terminus
               alarm: alarm.to_h,
               attachments: attach.map(&:to_s),
               attendees: attendee.map(&:to_s),
-              categories: categories.map(&:to_s),
+              categories: categories.flatten.map(&:to_s),
               classification: ip_class.to_s,
               color: color.to_s,
               comments: comment.map(&:to_s),

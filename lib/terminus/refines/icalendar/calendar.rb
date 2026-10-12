@@ -13,7 +13,7 @@ module Terminus
         refine ::Icalendar::Calendar do
           def to_h
             {
-              categories: categories.map(&:to_s),
+              categories: categories.flatten.map(&:to_s),
               color: color.to_s,
               description: description.map(&:to_s),
               events: events.map { it.to_h },
