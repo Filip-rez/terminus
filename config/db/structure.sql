@@ -776,7 +776,8 @@ CREATE TABLE public.screen_template (
     label text NOT NULL,
     content text NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    mode text DEFAULT 'text'::text NOT NULL
 );
 
 
@@ -1792,4 +1793,5 @@ INSERT INTO schema_migrations (filename) VALUES
 ('20260824132105_add_device_firmware_reset_column.rb'),
 ('20260825130920_drop_screen_kind_enum.rb'),
 ('20260902101629_alter_device_log_sleep_duration_type.rb'),
-('20261006094916_drop_firmware_kind.rb');
+('20261006094916_drop_firmware_kind.rb'),
+('20261012090556_add_screen_template_kind.rb');
