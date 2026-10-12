@@ -17,9 +17,23 @@ RSpec.describe Terminus::Actions::Designs::Create, :db do
         design: {
           label: "Test",
           name: :test,
+          mode: "text",
           content: "<p>Test</p>"
         }
       }
+    end
+
+    it "creates template" do
+      repository = Terminus::Repositories::ScreenTemplate.new
+
+      Rack::MockRequest.new(action).post "", params: parameters
+
+      expect(repository.find_by(name: "test")).to have_attributes(
+        name: "test",
+        label: "Test",
+        mode: "text",
+        content: "<p>Test</p>"
+      )
     end
 
     it "creates screen" do

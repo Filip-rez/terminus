@@ -17,6 +17,7 @@ module Terminus
           required(:design).hash do
             required(:label).filled :string
             required(:name).filled :string
+            required(:mode).filled :string
             required(:content).filled :string
           end
         end

@@ -17,6 +17,7 @@ RSpec.describe Terminus::Actions::Designs::Update, :db do
         design: {
           label: "Test Update",
           name: "test_update",
+          mode: "text",
           content: "<h1>Update</h1>"
         }
       }
@@ -32,8 +33,9 @@ RSpec.describe Terminus::Actions::Designs::Update, :db do
               model.id,
               {
                 "template_id" => template.id,
-                "name" => "test_update",
                 "label" => "Test Update",
+                "name" => "test_update",
+                "mode" => "text",
                 "content" => "<h1>Update</h1>"
               }
             ]
