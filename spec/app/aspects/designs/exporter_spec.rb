@@ -28,8 +28,9 @@ RSpec.describe Terminus::Aspects::Designs::Exporter do
       expect(proof["configuration.yml"]).to eq(<<~CONTENT)
         ---
         version: 1.2.3
-        label: Test
         name: test
+        label: Test
+        mode: text
       CONTENT
     end
 
