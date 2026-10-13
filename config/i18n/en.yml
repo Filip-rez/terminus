@@ -46,6 +46,8 @@ en:
             default:
               imported: Imported from TRMNL.
     firmware:
+      finder:
+        missing: "Unable to find firmware with version (%{version}) and model ID (%{model_id})."
       headers:
         parser:
           debug: Processing device request headers.
