@@ -18,6 +18,11 @@ RSpec.describe Terminus::Aspects::Firmware::Headers::Transformers::ModelName do
       expect(transformer.call(headers)).to be_success(HTTP_MODEL: "og_plus")
     end
 
+    it "transforms TRMNL OG 4 Color" do
+      headers = {HTTP_MODEL: "og_4clr"}
+      expect(transformer.call(headers)).to be_success(HTTP_MODEL: "og_bwry")
+    end
+
     it "transforms Paper S3" do
       headers = {HTTP_MODEL: "paper_s3"}
       expect(transformer.call(headers)).to be_success(HTTP_MODEL: "m5_paper_s3")

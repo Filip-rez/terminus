@@ -8,7 +8,7 @@ module Terminus
     module Firmware
       module Headers
         module Transformers
-          # Transforms a model name to a name that looked up in the database.
+          # Transforms a model name to a name that can be found in the database.
           class ModelName
             include Deps[:logger]
 
@@ -17,6 +17,7 @@ module Terminus
               map: {
                 "og" => "og_plus",
                 "og_gen2" => "og_plus",
+                "og_4clr" => "og_bwry",
                 "paper_s3" => "m5_paper_s3",
                 "reterminal_e1001" => "seeed_e1001",
                 "reterminal_e1002" => "seeed_e1002",
