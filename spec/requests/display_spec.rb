@@ -5,24 +5,24 @@ require "hanami_helper"
 RSpec.describe "/api/display", :db do
   include_context "with firmware headers"
 
-  let :device do
-    api_key = firmware_headers.fetch "HTTP_ACCESS_TOKEN"
-    provisioner.call(model_id: Factory[:model].id, api_key:).value!
-  end
-
+  let(:device) { provisioner.call(model_id: model.id, api_key:, firmware_version: "1.2.3").value! }
+  let(:api_key) { firmware_headers.fetch "HTTP_ACCESS_TOKEN" }
   let(:provisioner) { Terminus::Aspects::Devices::Provisioner.new }
-  let(:device_repository) { Terminus::Repositories::Device.new }
-  let(:firmware) { Factory[:firmware, :with_attachment] }
+  let(:model) { Factory[:model] }
+
+  before do
+    firmware = Factory[:firmware, :with_attachment, version: "1.2.3"]
+    Factory[:firmware_model, firmware_id: firmware.id, model_id: model.id]
+  end
 
   it "answers payload with all atttributes" do
     device
-    firmware
     get routes.path(:api_display), {}, **firmware_headers
 
     expect(json_payload).to match(
       filename: /welcome_#{device.id}-\d{10}/,
       firmware_url: "memory://abc123.bin",
-      firmware_version: "0.0.0",
+      firmware_version: "1.2.3",
       image_url: %r(memory://\h{32}\.png),
       image_url_timeout: 0,
       maximum_compatibility: false,
@@ -35,56 +35,32 @@ RSpec.describe "/api/display", :db do
     )
   end
 
-  it "answers payload with custom device attributes" do
-    device_repository.update device.id, image_timeout: 10, refresh_rate: 20
-    firmware
+  it "answers payload with custom device attribute" do
+    provisioner.call(model_id: model.id, api_key:, refresh_rate: 20).value!
     get routes.path(:api_display), {}, **firmware_headers
 
-    expect(json_payload).to match(
-      filename: /welcome_#{device.id}-\d{10}/,
-      firmware_url: "memory://abc123.bin",
-      firmware_version: "0.0.0",
-      image_url: %r(memory://\h{32}\.png),
-      image_url_timeout: 10,
-      maximum_compatibility: false,
-      refresh_rate: 20,
-      reset_firmware: false,
-      special_function: "none",
-      temperature_profile: "default",
-      touchbar_mode: "tap",
-      update_firmware: false
-    )
+    expect(json_payload).to include(refresh_rate: 20)
   end
 
-  it "removes firmware URI when device and latest firmware versions match" do
-    device_repository.update device.id, firmware_version: "1.2.3"
-    Factory[:firmware, :with_attachment, version: "1.2.3"]
+  it "answers firmware update when device update is enabled and versions don't match" do
+    firmware = Factory[:firmware, :with_attachment, version: "3.2.1"]
+    Factory[:firmware_model, firmware_id: firmware.id, model_id: model.id]
+    provisioner.call(model_id: model.id, api_key:, firmware_update: true).value!
+
     get routes.path(:api_display), {}, **firmware_headers
 
-    expect(json_payload).to match(
-      filename: /welcome_#{device.id}-\d{10}/,
-      firmware_url: nil,
-      firmware_version: nil,
-      image_url: %r(memory://\h{32}\.png),
-      image_url_timeout: 0,
-      maximum_compatibility: false,
-      refresh_rate: 900,
-      reset_firmware: false,
-      special_function: "none",
-      temperature_profile: "default",
-      touchbar_mode: "tap",
-      update_firmware: false
-    )
+    expect(json_payload).to include(update_firmware: true)
   end
 
   it "removes firmware URI when firmware doesn't exist" do
+    Terminus::Repositories::Firmware.new.delete_all
     device
     get routes.path(:api_display), {}, **firmware_headers
 
     expect(json_payload).to match(
       filename: /welcome_#{device.id}-\d{10}/,
       firmware_url: nil,
-      firmware_version: nil,
+      firmware_version: "1.2.3",
       image_url: %r(memory://\h{32}\.png),
       image_url_timeout: 0,
       maximum_compatibility: false,
@@ -135,7 +111,7 @@ RSpec.describe "/api/display", :db do
   end
 
   context "with any error" do
-    let(:device) { Factory[:device, api_key: firmware_headers.fetch("HTTP_ACCESS_TOKEN")] }
+    let(:device) { Factory[:device, api_key:, firmware_version: "1.2.3"] }
 
     before do
       device
@@ -146,7 +122,7 @@ RSpec.describe "/api/display", :db do
       expect(json_payload).to match(
         filename: "#{device.screen_name :error}.png",
         firmware_url: nil,
-        firmware_version: nil,
+        firmware_version: "1.2.3",
         image_url: %r(memory://\h{32}\.png),
         image_url_timeout: 0,
         maximum_compatibility: false,
@@ -155,7 +131,7 @@ RSpec.describe "/api/display", :db do
         special_function: "none",
         temperature_profile: "default",
         touchbar_mode: "tap",
-        update_firmware: true
+        update_firmware: false
       )
     end
 

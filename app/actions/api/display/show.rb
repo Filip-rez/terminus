@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "core"
 require "trmnl/api"
 
 module Terminus
@@ -14,7 +15,7 @@ module Terminus
             "aspects.devices.synchronizer",
             "aspects.screens.interrupter",
             "aspects.screens.interrupts.error",
-            firmware_repository: "repositories.firmware"
+            firmware_finder: "aspects.firmware.finder"
           ]
 
           include Initable[model: TRMNL::API::Models::Display]
@@ -56,21 +57,20 @@ module Terminus
           end
 
           def build_payload device, attributes
-            model[**fetch_firmware(device), **attributes, **device.display_attributes]
+            model[**add_firmware(device), **attributes, **device.display_attributes]
           end
 
-          def fetch_firmware device
-            firmware_repository.latest.then do |firmware|
-              break unless firmware
+          # :reek:FeatureEnvy
+          def add_firmware device
+            case firmware_finder.call model_id: device.model_id
+              in Success(firmware)
+                update = device.firmware_update && (device.firmware_version != firmware.version)
 
-              version = firmware.version
-
-              break if device.firmware_version == version
-
-              {
-                firmware_url: firmware.attachment_uri(host: settings.api_uri),
-                firmware_version: version
-              }
+                {
+                  firmware_url: firmware.attachment_uri(host: settings.api_uri),
+                  update_firmware: update
+                }
+              else Core::EMPTY_HASH
             end
           end
 
@@ -78,7 +78,7 @@ module Terminus
             payload = model[
               filename: screen.image_name,
               image_url: screen.image_uri(host: settings.api_uri),
-              **fetch_firmware(device),
+              **add_firmware(device),
               **device.display_attributes
             ]
 
