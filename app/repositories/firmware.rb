@@ -12,7 +12,7 @@ module Terminus
                use: :timestamps,
                plugins_options: {timestamps: {timestamps: :updated_at}}
 
-      def all = with_associations.by_version_desc.to_a
+      def all = with_associations.version_descending.to_a
 
       def create_with_models attributes, model_ids
         transaction do
