@@ -102,20 +102,26 @@ RSpec.describe Terminus::Repositories::Firmware, :db do
   end
 
   describe "#find_by" do
+    let(:model) { Factory[:model] }
+
+    before { Factory[:firmware_model, firmware_id: firmware.id, model_id: model.id] }
+
     it "answers record when found by single attribute" do
       expect(repository.find_by(version: firmware.version).id).to eq(firmware.id)
     end
 
     it "answers record when found by multiple attributes" do
-      expect(repository.find_by(id: firmware.id, version: firmware.version).id).to eq(firmware.id)
+      expect(repository.find_by(model_id: model.id, version: firmware.version).id).to eq(
+        firmware.id
+      )
     end
 
-    it "answers nil when not found" do
+    it "answers nil when not found by model" do
+      expect(repository.find_by(model_id: 666)).to be(nil)
+    end
+
+    it "answers nil when not found by version" do
       expect(repository.find_by(version: "6.6.6")).to be(nil)
-    end
-
-    it "answers nil for nil" do
-      expect(repository.find_by(version: nil)).to be(nil)
     end
   end
 
@@ -211,22 +217,21 @@ RSpec.describe Terminus::Repositories::Firmware, :db do
     before { Factory[:firmware_model, firmware_id: firmware.id, model_id: model.id] }
 
     it "answers records for single attribute" do
-      expect(repository.where(version: firmware.version)).to contain_exactly(firmware)
+      expect(repository.where(version: firmware.version).map(&:id)).to contain_exactly(firmware.id)
     end
 
     it "answers records for multiple attributes" do
-      records = repository.where firmware_id: firmware.id, version: firmware.version
-      expect(records).to contain_exactly(firmware)
+      ids = repository.where(firmware_id: firmware.id, version: firmware.version).map(&:id)
+      expect(ids).to contain_exactly(firmware.id)
     end
 
     it "answers records for model attribute" do
-      expect(repository.where(name: model.name)).to contain_exactly(firmware)
+      expect(repository.where(name: model.name).map(&:id)).to contain_exactly(firmware.id)
     end
 
     it "answers records for firmware and model attributes" do
-      expect(repository.where(version: firmware.version, label: model.label)).to contain_exactly(
-        firmware
-      )
+      ids = repository.where(version: firmware.version, label: model.label).map(&:id)
+      expect(ids).to contain_exactly(firmware.id)
     end
 
     it "answers empty array for unknown value" do

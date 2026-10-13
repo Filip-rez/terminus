@@ -39,11 +39,10 @@ module Terminus
 
       def find(id) = (with_associations.by_pk(id).one if id)
 
-      def find_by(**) = with_associations.where(**).one
+      def find_by(**) = firmware.with_model(**).one
 
       def latest = all.first
 
-      # :reek:FeatureEnvy
       def replace_attachment record, version, io
         return unless io
 
@@ -66,11 +65,7 @@ module Terminus
         end
       end
 
-      def where(**)
-        firmware.join(:firmware_model, firmware_id: :id)
-                .join(:model, id: firmware_model[:model_id])
-                .where(**).to_a
-      end
+      def where(**) = firmware.with_model(**).to_a
 
       private
 
