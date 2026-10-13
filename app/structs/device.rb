@@ -32,7 +32,7 @@ module Terminus
           refresh_rate:,
           temperature_profile: display_profile,
           touchbar_mode: touch_bar,
-          update_firmware: firmware_update,
+          firmware_version:,
           reset_firmware: firmware_reset
         }
       end
