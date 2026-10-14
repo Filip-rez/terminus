@@ -19,10 +19,11 @@ module Terminus
               exchange_creator: "aspects.extensions.importers.local.creators.exchange"
             ]
             include Initable[
-              key_map: {
-                "configuration.yml" => :configuration,
-                "template.html.liquid" => :template
-              }
+  key_map: {
+    "settings.yml" => :configuration,
+    "full.liquid" => :template
+  }
+]
             ]
             include Dry::Monads[:result]
 
