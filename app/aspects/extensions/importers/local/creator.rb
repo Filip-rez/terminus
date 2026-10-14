@@ -48,9 +48,11 @@ module Terminus
 
             attr_reader :schema
 
-            def transform entries
-              entries.transform_keys!(key_map).then { {**it, **YAML.load(it[:configuration])} }
-            end
+         def transform entries
+  entries.transform_keys!(key_map)
+  raise "Brak pliku konfiguracyjnego w ZIP!" unless it[:configuration]
+  {**entries, **YAML.load(entries[:configuration])}
+end
 
             def create_exchanges extension, attributes
               attributes.fetch("exchanges", Core::EMPTY_ARRAY)
