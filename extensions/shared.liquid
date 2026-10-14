@@ -1,0 +1,70 @@
+<style>
+  .month-grid,
+  .month-grid * {
+    font-family: "Inter Variable", "Inter var", Inter, system-ui, sans-serif;
+  }
+  .month-grid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: visible;
+  }
+  .month-weekdays,
+  .month-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+  .month-weekdays { flex: 0 0 auto; }
+  .month-weekday {
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    font: 600 13px/1.3 "Inter Variable", Inter, sans-serif;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+  .month-days {
+    flex: 1 1 auto;
+    min-height: 0;
+    align-items: stretch;
+    grid-auto-rows: min-content;
+    overflow: visible;
+  }
+  .month-day {
+    min-height: 72px;
+    height: 100%;
+    border-top: 1px solid #dedede;
+    border-left: 1px solid #dedede;
+    border-right: 4px solid transparent;
+    border-bottom: 6px solid transparent;
+    overflow: visible;
+    box-sizing: border-box;
+  }
+  .month-day:nth-child(7n+1) { border-left-width: 0; }
+  .month-day-num {
+    font: 600 13px/1.3 "Inter Variable", Inter, sans-serif;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+  .month-day--today .month-day-num span {
+    display: inline-block;
+    border-left-width: 6px;
+    border-right-width: 6px;
+    line-height: 1.3;
+  }
+  .month-day-events { display: flex; flex-direction: column; gap: 4px; }
+  .month-event {
+    font: 700 12px/1.25 "Inter Variable", Inter, sans-serif;
+  }
+  .month-event--all-day {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+  }
+  .month-event-time {
+    display: block;
+    font: 400 12px/1.25 "Inter Variable", Inter, sans-serif;
+  }
+</style>

@@ -1,0 +1,8 @@
+{% assign cal = google_calendar_455841 %}
+{% assign today_iso = cal.today_in_tz | default: 'now' | date: '%Y-%m-%d' %}
+{% assign today_label = today_iso | date: '%A, %-d %B %Y' %}
+
+<div class="layout layout--col">
+  <div class="title title--small">{{ today_label }}</div>
+  <div class="description">Open the full view for the month grid.</div>
+</div>
