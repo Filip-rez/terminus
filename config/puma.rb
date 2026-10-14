@@ -13,7 +13,7 @@ concurrency = Integer ENV.fetch("HANAMI_WEB_CONCURRENCY", 0)
 
 threads min_threads, max_threads
 max_io_threads 5
-port ENV.fetch("HANAMI_PORT")
+port ENV.fetch("PORT", ENV.fetch("HANAMI_PORT", 10000))
 environment ENV.fetch("HANAMI_ENV", "development")
 workers concurrency
 worker_timeout 3600 if development
