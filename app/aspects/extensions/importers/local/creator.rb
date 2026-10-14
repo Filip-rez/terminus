@@ -48,10 +48,20 @@ module Terminus
 
             attr_reader :schema
 
-         def transform entries
+        def transform(entries)
+  warn "===== TERMINUS ZIP DEBUG ====="
+  warn "FILES: #{entries.keys.inspect}"
+  warn "KEY MAP: #{key_map.inspect}"
+
   entries.transform_keys!(key_map)
-  raise "Brak pliku konfiguracyjnego w ZIP!" unless it[:configuration]
-  {**entries, **YAML.load(entries[:configuration])}
+
+  unless entries[:configuration]
+    raise "Brak settings.yml! Dostępne pliki: #{entries.keys.inspect}"
+  end
+
+  config = YAML.safe_load(entries[:configuration])
+
+  { **entries, **config }
 end
 
             def create_exchanges extension, attributes
