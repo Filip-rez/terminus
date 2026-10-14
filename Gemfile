@@ -92,3 +92,4 @@ group :tools do
   gem "irb-kit", "~> 2.0"
   gem "repl_type_completor", "~> 0.1"
 end
+gem "sqlite3"
