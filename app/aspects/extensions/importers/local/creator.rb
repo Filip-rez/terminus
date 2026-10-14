@@ -19,11 +19,12 @@ module Terminus
               exchange_creator: "aspects.extensions.importers.local.creators.exchange"
             ]
             include Initable[
-  key_map: {
-    "settings.yml" => :configuration,
-    "full.liquid" => :template
-  }
-]
+              key_map: {
+                "settings.yml" => :configuration,
+                "configuration.yml" => :configuration,
+                "full.liquid" => :template,
+                "template.html.liquid" => :template
+              }
             ]
             include Dry::Monads[:result]
 
@@ -32,37 +33,37 @@ module Terminus
               super(**)
             end
 
-            # :reek:TooManyStatements
-            # rubocop:todo-next Metrics/AbcSize
             def call io, attributes: {}
               unzipper.call(io)
-                      .fmap { |entries| transform entries }
-                      .fmap { attributes.replace it }
-                      .bind { schema.call(it).to_monad }
-                      .alt_map { detailer.call it, "Import " }
-                      .bind { extension_creator.call attributes }
-                      .bind { create_exchanges it, attributes }
+                    .bind { |entries| transform entries }
+                    .fmap { attributes.replace it }
+                    .bind { schema.call(it).to_monad }
+                    .alt_map { detailer.call it, "Import " }
+                    .bind { extension_creator.call attributes }
+                    .bind { create_exchanges it, attributes }
             end
 
             private
 
             attr_reader :schema
 
-        def transform(entries)
-  warn "===== TERMINUS ZIP DEBUG ====="
-  warn "FILES: #{entries.keys.inspect}"
-  warn "KEY MAP: #{key_map.inspect}"
+            def transform entries
+              normalized_entries = {}
 
-  entries.transform_keys!(key_map)
+              entries.each do |filename, content|
+                clean_name = File.basename(filename.to_s)
+                mapped_key = key_map[clean_name] || clean_name.to_sym
+                normalized_entries[mapped_key] = content
+              end
 
-  unless entries[:configuration]
-    raise "Brak settings.yml! Dostępne pliki: #{entries.keys.inspect}"
-  end
+              config_content = normalized_entries[:configuration]
+              return Failure(["Brak pliku konfiguracyjnego (settings.yml / configuration.yml) w archiwum ZIP!"]) unless config_content
 
-  config = YAML.safe_load(entries[:configuration])
+              parsed_config = YAML.safe_load(config_content)
+              return Failure(["Niepoprawny format pliku YAML w konfiguracji."]) unless parsed_config.is_a?(Hash)
 
-  { **entries, **config }
-end
+              Success({ **normalized_entries, **parsed_config })
+            end
 
             def create_exchanges extension, attributes
               attributes.fetch("exchanges", Core::EMPTY_ARRAY)
@@ -72,7 +73,7 @@ end
             def create_exchange result, attributes
               result.bind do |extension|
                 exchange_creator.call(attributes.merge!(extension_id: extension.id))
-                                .fmap { extension }
+                              .fmap { extension }
               end
             end
           end
