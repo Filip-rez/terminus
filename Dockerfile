@@ -37,7 +37,8 @@ RUN <<STEPS
   locales \
   lsb-release \
   npm \
-  tmux
+  tmux \
+  unzip
   curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg
   echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
   curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash -
